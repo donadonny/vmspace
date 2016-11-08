@@ -46,31 +46,37 @@ func NewNodeMgnager() *NodeManager {
 }
 
 func (m *NodeManager) Send(args *SendArgs, reply *SendReply) error {
-	fmt.Printf("Send Node[%v] Data here!!\n", args.Deveui)
+	fmt.Printf("Send Node [%v] Data here!!\n", args.Deveui)
 	reply.Code = 200
 	// node has or not
 	if n, ok := m.nodes[args.Deveui]; ok {
 		n.deveui = args.Deveui
 		n.lat = args.Lat
 		n.lng = args.Lng
-		m.uplink[args.Deveui] = args.Payload
+		if args.Payload != nil {
+			m.uplink[args.Deveui] = args.Payload
+		}
 	} else {
 		var newnode Node
 		newnode.deveui = args.Deveui
 		newnode.lat = args.Lat
 		newnode.lng = args.Lng
 		m.nodes[args.Deveui] = newnode
-		m.uplink[args.Deveui] = args.Payload
+		if args.Payload != nil {
+			m.uplink[args.Deveui] = args.Payload
+		}
 	}
+	fmt.Println("m = ", m)
 	return nil
 }
 
 func (m *NodeManager) Receive(args *ReceiveArgs, reply *ReceiveReply) error {
-	fmt.Printf("Receive Node[%v] Data here!!\n", args.Deveui)
+	fmt.Printf("Receive Node [%v] Data here!!\n", args.Deveui)
 	reply.Payload = nil
 	if down, ok := m.downlink[args.Deveui]; ok {
 		reply.Payload = down
 		delete(m.downlink, args.Deveui)
 	}
+	fmt.Println("m = ", m)
 	return nil
 }
