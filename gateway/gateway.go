@@ -45,6 +45,7 @@ func NewGWMgnager() *GatewayManager {
 	return &b
 }
 
+//RPC Interface
 func (m *GatewayManager) Send(args *GWSendArgs, reply *GWSendReply) error {
 	fmt.Printf("Send GW [%v] Data here!!\n", args.Gwid)
 	reply.Code = 200
@@ -66,10 +67,11 @@ func (m *GatewayManager) Send(args *GWSendArgs, reply *GWSendReply) error {
 			m.downlink[args.Gwid] = args.Payload
 		}
 	}
-	fmt.Println("m = ", m)
+	fmt.Println("[GM] = ", m)
 	return nil
 }
 
+//RPC Interface
 func (m *GatewayManager) Receive(args *GWReceiveArgs, reply *GWReceiveReply) error {
 	fmt.Printf("Receive GW [%v] Data here!!\n", args.Gwid)
 	reply.Payload = nil
@@ -77,6 +79,26 @@ func (m *GatewayManager) Receive(args *GWReceiveArgs, reply *GWReceiveReply) err
 		reply.Payload = up
 		delete(m.uplink, args.Gwid)
 	}
-	fmt.Println("m = ", m)
+	fmt.Println("[GM] = ", m)
 	return nil
+}
+
+//Query Download PHYPayload(not RPC Interface)
+func (m *GatewayManager) GetDownlinkPayload() []byte {
+	for _, v := range m.downlink {
+		if len(v) != 0 {
+			return v
+		}
+	}
+	return nil
+}
+
+//Set Uplink PHYPayload (not RPC Interface)
+func (m *GatewayManager) SetUplinkPayload(payload []byte) {
+	if payload != nil && len(payload) > 0 {
+		for k, _ := range m.gws {
+			m.uplink[k] = payload
+		}
+	}
+	fmt.Println("[GM] = ", m)
 }

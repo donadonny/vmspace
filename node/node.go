@@ -45,6 +45,7 @@ func NewNodeMgnager() *NodeManager {
 	return &b
 }
 
+//RPC Interface
 func (m *NodeManager) Send(args *SendArgs, reply *SendReply) error {
 	fmt.Printf("Send Node [%v] Data here!!\n", args.Deveui)
 	reply.Code = 200
@@ -66,10 +67,11 @@ func (m *NodeManager) Send(args *SendArgs, reply *SendReply) error {
 			m.uplink[args.Deveui] = args.Payload
 		}
 	}
-	fmt.Println("m = ", m)
+	fmt.Println("[NM] = ", m)
 	return nil
 }
 
+//RPC Interface
 func (m *NodeManager) Receive(args *ReceiveArgs, reply *ReceiveReply) error {
 	fmt.Printf("Receive Node [%v] Data here!!\n", args.Deveui)
 	reply.Payload = nil
@@ -77,6 +79,26 @@ func (m *NodeManager) Receive(args *ReceiveArgs, reply *ReceiveReply) error {
 		reply.Payload = down
 		delete(m.downlink, args.Deveui)
 	}
-	fmt.Println("m = ", m)
+	fmt.Println("[NM] = ", m)
+	return nil
+}
+
+//Set Download PHYPayload (not RPC Interface)
+func (m *NodeManager) SetDownlinkPayload(payload []byte) {
+	if payload != nil && len(payload) > 0 {
+		for k, _ := range m.nodes {
+			m.downlink[k] = payload
+		}
+	}
+	fmt.Println("[NM] = ", m)
+}
+
+//Query Uplink PHYPayload(not RPC Interface)
+func (m *NodeManager) GetUplinkPayload() []byte {
+	for _, v := range m.uplink {
+		if len(v) != 0 {
+			return v
+		}
+	}
 	return nil
 }
